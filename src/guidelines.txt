@@ -1,0 +1,78 @@
+
+Problem statement --
+
+Job Scheduler
+Design and implement a Job Scheduler that allows users to -
+register multiple jobs for execution
+execute the jobs at the scheduled time
+retries on failure
+logs executions.
+Requirements - Must Have
+Register a job :
+name, executionDuration (in seconds), max_retries, retry_delay, start_time
+status can have values like pending, scheduled, running, completed, failed, terminated
+Job is always created in pending state
+failure/completion of job can be simulated by random interface locally
+Should be able to do Update operation on Job - only for pending jobs
+Execute jobs for the specified executionDuration
+Retry failed jobs with a delay
+Keep track of logs for each job execution:
+Timestamp, JobName, status (completed/failed), WorkerName, retry count, error (if any)
+Parallel execution of Job by multiple workers
+#Workers is initialised during application bootstrap
+Have an Execute interface which triggers the execution for all the jobs
+
+Bonus - Good to Have
+Priority and preemption of a job - (lower number carries higher precedence)
+Scheduled Recurring Jobs [until a specified END time]
+
+Example -
+#Workers = 2  [ Worker1, Worker2 ]
+Register a job -
+
+{
+"name": “myScheduledJob1”,
+"executionDuration": 30 (in seconds),
+"maxRetries": 1,
+"retryDelay": 10 (in seconds),
+"startTime": 2025-05-15T09:10:00Z,
+"priority": 1 [optional],
+"recurrence": 120 ( in seconds ) [optional]
+}
+
+{
+"name": “myScheduledJob2”,
+"executionDuration": 60 (in seconds),
+"maxRetries": 3,
+"retryDelay": 10 (in seconds),
+"startTime": 2025-05-15T09:10:35Z,
+"priority": 1 [optional],
+"recurrence": 300 ( in seconds ) [optional]
+}
+
+
+Sample log output -
+Execute()
+
+2025-05-15T09:05:00Z myScheduledJob1 created (pending state)
+2025-05-15T09:05:01Z myScheduledJob2 created (pending state)
+
+2025-05-15T09:10:00Z myScheduledJob1 on Worker1 scheduled, 0 retry
+2025-05-15T09:10:30Z myScheduledJob1 on Worker1 failed, 0 retry, externalError
+
+2025-05-15T09:10:35Z myScheduledJob2 on Worker1 scheduled, 0 retry
+
+2025-05-15T09:10:40Z myScheduledJob1 on Worker2 scheduled, 1 retry
+2025-05-15T09:11:10Z myScheduledJob1 on Worker2 terminated, 1 retry, externalError
+2025-05-15T09:11:35Z myScheduledJob2 on Worker1 completed
+
+
+Guidelines:
+Time: 120  mins.
+Write modular, clean and demoable code (Test cases or runtime execution).
+A driver program/main class/test case is needed to test out the code by the evaluator with multiple test cases. But do not spend too much time in the input parsing. Keep it as simple as possible.
+Please handle concurrency wherever applicable.
+Evaluation criteria:  Demoable & functionally correct code, Code readability, Proper Entity modelling, Modularity & Extensibility, Separation of concerns, Abstractions, Exception Handling, Code comments. Use design patterns wherever applicable
+You are not allowed to use any external databases like MySQL. Use only in-memory data structures.
+No need to create any UX or any HTTP API. It should be a standalone application.
+Please focus on the Bonus Features only after ensuring the required features are complete and demoable.
