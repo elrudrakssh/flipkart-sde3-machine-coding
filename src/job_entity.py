@@ -41,9 +41,17 @@ class JobEntity:
         self.job_end_time = self.job_start_time + datetime.timedelta(
             seconds=2 * 60) if not job_end_time else job_end_time
 
+    @property
+    def status(self):
+        return self.job_status
+
+    @status.setter
+    def status(self, status: str):
+        self.job_status = status
+
     def __str__(self):
         """String representation of JobEntity."""
-        return f"{self.__class__.__name__}(job_id={self.job_id}, job_status={self.job_status}, job_start_time={self.job_start_time}, job_end_time={self.job_end_time})"
+        return f"{self.__class__.__name__}(job_id={self.job_id}, job_status={self.status}, job_start_time={self.job_start_time}, job_end_time={self.job_end_time})"
 
     def __eq__(self, other: "JobEntity"):
         if isinstance(other, JobEntity):

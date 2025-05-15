@@ -4,7 +4,7 @@ JobScheduler - KitchenManager Class
 Job dto -- to handle Job class entity
 Worker Class -- Chef worker handling
 Job Status -- String Enum
-Constants -- value objects specific to class hanfling
+Constants -- value objects specific to class handling
 Job logger -- definition on logging pattern
 
 """
@@ -18,13 +18,15 @@ from kink import Container, di
 
 
 def bootstrap(di: Container) -> None:
-    di[Scheduler] = JobScheduler(num_workers=3).executor()
+    di["JobScheduler"] = JobScheduler(num_workers=3)
+    di["Executor"] = di["JobScheduler"].executor()
 
 
 class TestDriver:
     """Test driver for the job scheduler."""
     def __init__(self, workers: int = 5) -> None:
-        self.scheduler = JobScheduler(num_workers=workers)
+        bootstrap(di)
+        self.scheduler = di["JobScheduler"]
         self.scheduler.start()
 
     def __call__(self, *args, **kwargs):
@@ -51,19 +53,20 @@ class TestDriver:
                 "name": "myScheduledJob2",
                 "execution_duration": 60,
                 "retry_delay": 3,
-                "retryDelay": 10,
                 "start_time": (datetime.now() + timedelta(seconds=35)).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "priority": 1,
                 "recurrence": 300
             })
 
             # Execute jobs
-            _ = di[Scheduler]
+            _ = di["Executor"]
 
             # Wait for jobs to complete
             time.sleep(6)  # Wait for 5 minutes to see recurring jobs
 
             # TODO: need to print the Thread execution logs
+            for _worker_logs in self.scheduler.get_all_job_logs:
+                base_logger.info(_worker_logs)
 
         finally:
             # Stop the scheduler
